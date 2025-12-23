@@ -1,5 +1,6 @@
 datasource db {
   provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -7,171 +8,228 @@ generator client {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  
+  id Int @id @default(autoincrement())
+
   // Authentication
-  email         String   @unique
-  password      String
-  googleId      String?  @map("google_id")
+  email    String  @unique
+  password String
+  googleId String? @map("google_id")
 
   // Personal Details
-  title         String?
-  firstName     String?  @map("First_Name")
-  lastName      String?  @map("Last_Name")
-  profilePic    String?  @map("Pro_Pic")
+  title      String?
+  firstName  String? @map("First_Name")
+  lastName   String? @map("Last_Name")
+  profilePic String? @map("Pro_Pic")
 
   // Contact Information
-  contactNo1    String?  @map("Contact_No_01")
-  contactNo2    String?  @map("Contact_No_02")
+  contactNo1 String? @map("Contact_No_01")
+  contactNo2 String? @map("Contact_No_02")
 
   // Address
   country       String?
   state         String?
   district      String?
   city          String?
-  streetAddress String?  @map("Street_Address")
+  streetAddress String? @map("Street_Address")
 
   // Verification
-  emailVerified Boolean  @default(false)
+  emailVerified  Boolean @default(false)
   mobileVerified Boolean @default(false)
 
   // Status & Meta
-  isActive      Boolean  @default(true)
-  comment       String?  @map("Asipiya_Comment")
+  isActive Boolean @default(true)
+  comment  String? @map("Asipiya_Comment")
 
   // OTP (temporary authentication data)
-  otp           String?
-  otpExpiresAt  DateTime?
+  otp          String?
+  otpExpiresAt DateTime?
 
   // Timestamps
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Legacy / Generated ID
+  generatedId Int? @map("generatedid")
 
   userPrivileges UserPrivilege[]
+  companyUsers   CompanyHasUser[]
 
   @@map("asipiya_users")
 }
 
 model UserPrivilege {
-  id        Int  @id @default(autoincrement())
-  
-  // Relations
-  userId    Int  @map("User_idUser")
-  branchId  Int  @map("Branch_idBranch")
+  id Int @id @default(autoincrement())
 
-  user      User @relation(fields: [userId], references: [id])
+  // Relations
+  userId   Int @map("User_idUser")
+  branchId Int @map("Branch_idBranch")
+
+  user User @relation(fields: [userId], references: [id])
 
   // Account & Customer
-  account                    Boolean @default(false)
-  customerManagement         Boolean @default(false)
-  addCustomer                Boolean @default(false)
-  editCustomer               Boolean @default(false)
-  changeCustomerStatus       Boolean @default(false)
-  customerCreditLogs         Boolean @default(false)
-  recordPayment              Boolean @default(false)
+  account              Boolean @default(false)
+  customerManagement   Boolean @default(false)
+  addCustomer          Boolean @default(false)
+  editCustomer         Boolean @default(false)
+  changeCustomerStatus Boolean @default(false)
+  customerCreditLogs   Boolean @default(false)
+  recordPayment        Boolean @default(false)
 
   // Customer Returns
-  customerReturns            Boolean @default(false)
-  addCustomerReturn          Boolean @default(false)
-  editCustomerReturn         Boolean @default(false)
-  processCustomerReturn      Boolean @default(false)
+  customerReturns       Boolean @default(false)
+  addCustomerReturn     Boolean @default(false)
+  editCustomerReturn    Boolean @default(false)
+  processCustomerReturn Boolean @default(false)
 
   // Quotations
-  quotationManagement        Boolean @default(false)
-  addQuotation               Boolean @default(false)
-  editQuotation              Boolean @default(false)
-  deleteQuotation            Boolean @default(false)
+  quotationManagement Boolean @default(false)
+  addQuotation        Boolean @default(false)
+  editQuotation       Boolean @default(false)
+  deleteQuotation     Boolean @default(false)
 
   // Invoices
-  invoices                   Boolean @default(false)
-  addInvoices                Boolean @default(false)
-  editInvoices               Boolean @default(false)
-  deleteInvoices             Boolean @default(false)
+  invoices       Boolean @default(false)
+  addInvoices    Boolean @default(false)
+  editInvoices   Boolean @default(false)
+  deleteInvoices Boolean @default(false)
 
   // Discounts
-  maximumItemDiscount        Int     @default(0)
-  maximumBillDiscount        Int     @default(0)
+  maximumItemDiscount Int @default(0)
+  maximumBillDiscount Int @default(0)
 
   // Due Payments
-  duePayments                Boolean @default(false)
-  processDuePayments         Boolean @default(false)
+  duePayments        Boolean @default(false)
+  processDuePayments Boolean @default(false)
 
   // Product Categories
-  productCategoryManagement  Boolean @default(false)
-  addEditProductCategory     Boolean @default(false)
+  productCategoryManagement Boolean @default(false)
+  addEditProductCategory    Boolean @default(false)
 
   // Products
-  productsManagement         Boolean @default(false)
-  addProducts                Boolean @default(false)
-  editProducts               Boolean @default(false)
-  changeStatusProducts       Boolean @default(false)
+  productsManagement   Boolean @default(false)
+  addProducts          Boolean @default(false)
+  editProducts         Boolean @default(false)
+  changeStatusProducts Boolean @default(false)
 
   // GRN
-  grn                         Boolean @default(false)
-  addGrns                     Boolean @default(false)
-  editGrns                    Boolean @default(false)
-  processGrns                Boolean @default(false)
+  grn         Boolean @default(false)
+  addGrns     Boolean @default(false)
+  editGrns    Boolean @default(false)
+  processGrns Boolean @default(false)
 
   // Barcodes & Damage
-  barcodes                    Boolean @default(false)
-  damageNote                 Boolean @default(false)
-  addDamageNote              Boolean @default(false)
+  barcodes      Boolean @default(false)
+  damageNote    Boolean @default(false)
+  addDamageNote Boolean @default(false)
 
   // Suppliers
-  suppliersManagement        Boolean @default(false)
-  addSuppliers               Boolean @default(false)
-  editSuppliers              Boolean @default(false)
-  changeSuppliersStatus      Boolean @default(false)
-  deleteSuppliers             Boolean @default(false)
-  supplierCreditLogs         Boolean @default(false)
+  suppliersManagement   Boolean @default(false)
+  addSuppliers          Boolean @default(false)
+  editSuppliers         Boolean @default(false)
+  changeSuppliersStatus Boolean @default(false)
+  deleteSuppliers       Boolean @default(false)
+  supplierCreditLogs    Boolean @default(false)
 
   // Purchase Returns
-  purchaseReturns            Boolean @default(false)
-  addPurchaseReturns         Boolean @default(false)
-  editPurchaseReturns        Boolean @default(false)
-  processPurchaseReturns     Boolean @default(false)
+  purchaseReturns        Boolean @default(false)
+  addPurchaseReturns     Boolean @default(false)
+  editPurchaseReturns    Boolean @default(false)
+  processPurchaseReturns Boolean @default(false)
 
   // Salesmen
-  salesmen                   Boolean @default(false)
-  addSalesmen                Boolean @default(false)
-  editSalesmen               Boolean @default(false)
-  changeSalesmenStatus       Boolean @default(false)
+  salesmen             Boolean @default(false)
+  addSalesmen          Boolean @default(false)
+  editSalesmen         Boolean @default(false)
+  changeSalesmenStatus Boolean @default(false)
 
   // Earnings & Expenses
-  earningsExpenses           Boolean @default(false)
-  addEarningsExpenses        Boolean @default(false)
-  earningsExpensesCategory   Boolean @default(false)
+  earningsExpenses         Boolean @default(false)
+  addEarningsExpenses      Boolean @default(false)
+  earningsExpensesCategory Boolean @default(false)
 
   // Reports
-  reports                    Boolean @default(false)
-  itemReports                Boolean @default(false)
-  customerCreditLogReports   Boolean @default(false)
-  invoiceDetailReports       Boolean @default(false)
-  stockCardReports           Boolean @default(false)
-  plReports                  Boolean @default(false)
-  stockDetailReports         Boolean @default(false)
-  supplierReports            Boolean @default(false)
-  earningReports             Boolean @default(false)
-  expensesReports            Boolean @default(false)
-  customerReports            Boolean @default(false)
-  userReports                Boolean @default(false)
-  productReports             Boolean @default(false)
-  paymentReports             Boolean @default(false)
-  returnReports              Boolean @default(false)
-  monthlySalesReports        Boolean @default(false)
-  dailySalesReports          Boolean @default(false)
+  reports                  Boolean @default(false)
+  itemReports              Boolean @default(false)
+  customerCreditLogReports Boolean @default(false)
+  invoiceDetailReports     Boolean @default(false)
+  stockCardReports         Boolean @default(false)
+  plReports                Boolean @default(false)
+  stockDetailReports       Boolean @default(false)
+  supplierReports          Boolean @default(false)
+  earningReports           Boolean @default(false)
+  expensesReports          Boolean @default(false)
+  customerReports          Boolean @default(false)
+  userReports              Boolean @default(false)
+  productReports           Boolean @default(false)
+  paymentReports           Boolean @default(false)
+  returnReports            Boolean @default(false)
+  monthlySalesReports      Boolean @default(false)
+  dailySalesReports        Boolean @default(false)
 
   // Apps
-  apps                       Boolean @default(false)
-  pos                        Boolean @default(true)
+  apps Boolean @default(false)
+  pos  Boolean @default(true)
 
   // Stock Adjustments
-  addQuantity                Boolean @default(false)
-  adjustQuantity             Boolean @default(false)
+  addQuantity    Boolean @default(false)
+  adjustQuantity Boolean @default(false)
 
-  createdAt                  DateTime @default(now())
-  updatedAt                  DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("user_privilages")
 }
 
+model Company {
+  idCompany      Int     @id @default(autoincrement())
+  name           String  @map("Name")
+  address        String? @map("Address")
+  status         String? @default("1") @map("Status")
+  companyEmail   String? @map("Company_Email")
+  companyWebsite String? @map("Company_Website")
+
+  // Relations
+  companyCategoryId Int? @map("Company_Category_idCompany_Category")
+
+  branches     Branch[]
+  companyUsers CompanyHasUser[]
+
+  @@map("company")
+}
+
+model Branch {
+  idBranch       Int     @id @default(autoincrement())
+  name           String  @map("Name")
+  email          String? @map("email")
+  registeredDate String? @map("Registered_Date") // Keeping as String to match SQL "2023-01-01" insert if needed, or stick to DateTime
+  expireOn       String? @map("Expire_On")
+  address        String? @map("Address")
+  contactNo      String? @map("Contact_no")
+  status         String? @default("1") @map("Status")
+
+  companyId Int     @map("Company_idCompany")
+  company   Company @relation(fields: [companyId], references: [idCompany])
+
+  @@map("branch")
+}
+
+model CompanyHasUser {
+  companyId   Int     @map("Company_idCompany")
+  userId      Int     @map("Asipiya_User_idAsipiya_User")
+  role        String? @map("Role")
+  createdDate String? @map("Created_Date")
+  expireOn    String? @map("Expire_On")
+  status      String? @default("1") @map("Status")
+
+  company Company @relation(fields: [companyId], references: [idCompany])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@id([companyId, userId])
+  @@map("company_has_asipiya_user")
+}
+
+// Minimal definition if referenced but not fully detailed in prompt
+model CompanyCategory {
+  idCompanyCategory Int @id @default(autoincrement()) @map("idCompany_Category")
+  // Add other fields if known
+}
